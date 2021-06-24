@@ -90,7 +90,8 @@ subroutine  gsdcloudanalysis(mype)
                                       l_use_hydroretrieval_all, &
                                       i_lightpcp, l_numconc, qv_max_inc,ioption, &
                                       l_precip_clear_only,l_fog_off,cld_bld_coverage,cld_clr_coverage,&
-                                      i_T_Q_adjust,l_saturate_bkCloud,i_precip_vertical_check,l_rtma3d
+                                      i_T_Q_adjust,l_saturate_bkCloud,i_precip_vertical_check,&
+                                      r_cloudfrac_threshold,l_rtma3d
 
   use gsi_metguess_mod, only: GSI_MetGuess_Bundle
   use gsi_bundlemod, only: gsi_bundlegetpointer
@@ -110,6 +111,7 @@ subroutine  gsdcloudanalysis(mype)
   real(r_single),allocatable:: ps_bk(:,:)
   real(r_single),allocatable:: zh(:,:)
   real(r_single),allocatable:: q_bk(:,:,:)
+  real(r_single),allocatable:: cldfrabk(:,:,:)
 
   real(r_single),allocatable:: xlon(:,:)        ! 2D longitude in each grid
   real(r_single),allocatable:: xlat(:,:)        ! 2D latitude in each grid
@@ -240,6 +242,7 @@ subroutine  gsdcloudanalysis(mype)
   real(r_kind), pointer :: ges_qnr(:,:,:)=>NULL() ! rain number concentration
   real(r_kind), pointer :: ges_qni(:,:,:)=>NULL() ! cloud ice number concentration
   real(r_kind), pointer :: ges_qnc(:,:,:)=>NULL() ! cloud water number concentration
+  real(r_kind), pointer :: ges_fra(:,:,:)=>NULL() ! subgrid cloud fraction
 !
 !  misc.
 !
@@ -255,7 +258,7 @@ subroutine  gsdcloudanalysis(mype)
   character(10)   :: obstype
   integer(i_kind) :: lunin, is, ier, istatus
   integer(i_kind) :: nreal,nchanl,ilat1s,ilon1s
-  integer(i_kind) :: clean_count,build_count,part_count,miss_count
+  integer(i_kind) :: clean_count,few_build_count,build_count,part_count,miss_count
   character(20)   :: isis
 
   real(r_kind)    :: refmax,snowtemp,raintemp,nraintemp,graupeltemp
@@ -276,6 +279,7 @@ subroutine  gsdcloudanalysis(mype)
 !
 !
   clean_count=0
+  few_build_count=0
   build_count=0
   part_count=0
   miss_count=0
@@ -297,6 +301,7 @@ subroutine  gsdcloudanalysis(mype)
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qnr',ges_qnr,istatus);ier=ier+istatus
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qni',ges_qni,istatus);ier=ier+istatus
   call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'qnc',ges_qnc,istatus);ier=ier+istatus
+  call gsi_bundlegetpointer (GSI_MetGuess_Bundle(itsig),'fra',ges_fra,istatus);ier=ier+istatus
   if(ier/=0) return ! no guess, nothing to do
 
   !if(mype==0) then
@@ -612,6 +617,7 @@ subroutine  gsdcloudanalysis(mype)
   allocate(ps_bk(lon2,lat2))
   allocate(zh(lon2,lat2))
   allocate(q_bk(lon2,lat2,nsig))
+  allocate(cldfrabk(lon2,lat2,nsig))
   
   allocate(xlon(lon2,lat2))
   allocate(xlat(lon2,lat2))
@@ -667,6 +673,7 @@ subroutine  gsdcloudanalysis(mype)
            qmixr = q_bk(i,j,k)/(one - q_bk(i,j,k))     ! covert from specific humidity to mixing ratio
            t_bk(i,j,k)=ges_tv(j,i,k)/                                  &
                      (one+fv*q_bk(i,j,k))   ! virtual temp to temp
+           cldfrabk(i,j,k)=ges_fra(i,j,k)
         enddo
      enddo
   enddo
@@ -842,8 +849,26 @@ subroutine  gsdcloudanalysis(mype)
               nice_3d(i,j,k)     = zero
               nwater_3d(i,j,k)   = zero
               clean_count        = clean_count+1
-           ! build cloud
-           elseif( cld_cover_3d(i,j,k) > cld_bld_coverage .and. cld_cover_3d(i,j,k) < 2.0_r_kind   ) then      
+           ! build in moderate cloud areas - use half the cloud build for heavy cloud
+           !elseif( cld_cover_3d(i,j,k) > cld_clr_coverage .and. cld_cover_3d(i,j,k) <= cld_bld_coverage .and. ges_fra(j,i,k) < r_cloudfrac_threshold) then
+           !   cloudwater         = 0.5 * 0.001_r_kind*cldwater_3d(i,j,k)
+           !   cloudice           = 0.5 * 0.001_r_kind*cldice_3d(i,j,k)
+           !   cldwater_3d(i,j,k) = max(cloudwater,ges_ql(j,i,k))
+           !   cldice_3d(i,j,k)   = max(cloudice,ges_qi(j,i,k))
+           !   ! mhu: Feb2017: set qnc=1e8 and qni=1e6 when build cloud
+           !   if(cloudwater > 1.0e-7_r_kind .and. cloudwater >= ges_ql(j,i,k)) then
+           !      nwater_3d(i,j,k) = 1.0E8_r_single
+           !   else
+           !      nwater_3d(i,j,k) = ges_qnc(j,i,k)
+           !   endif
+           !   if(cloudice > 1.0e-7_r_kind .and. cloudice >= ges_qi(j,i,k)) then
+           !      nice_3d(i,j,k) = 1.0E6_r_single
+           !   else
+           !      nice_3d(i,j,k) = ges_qni(j,i,k)
+           !   endif
+           !   few_build_count=few_build_count+1
+           ! build heavy cloud areas
+           elseif( cld_cover_3d(i,j,k) > cld_bld_coverage .and. cld_cover_3d(i,j,k) < 2.0_r_kind .and. ges_fra(j,i,k) < r_cloudfrac_threshold) then
               cloudwater         =0.001_r_kind*cldwater_3d(i,j,k)
               cloudice           =0.001_r_kind*cldice_3d(i,j,k)
               cldwater_3d(i,j,k) = max(cloudwater,ges_ql(j,i,k))
@@ -1214,8 +1239,9 @@ subroutine  gsdcloudanalysis(mype)
 !  endif
 !
 !
-  call cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,  &
-                 lat2,lon2,nsig,q_bk,t_bk,p_bk,      &
+  call cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_cloudfrac_threshold, &
+                 cld_bld_coverage, &
+                 lat2,lon2,nsig,q_bk,t_bk,p_bk,cldfrabk,      &
                  cld_cover_3d,wthr_type_2d,cldwater_3d,cldice_3d,sumqci,qv_max_inc, l_saturate_bkCloud)
 
 
@@ -1312,7 +1338,7 @@ subroutine  gsdcloudanalysis(mype)
   deallocate(cld_cover_3d,cld_type_3d,wthr_type_2d, &
              pcp_type_3d,cloudlayers_i)
   deallocate(t_bk,h_bk,p_bk,ps_bk,zh,q_bk,sumqci,pblh)
-  deallocate(xlon,xlat,xland,soiltbk)
+  deallocate(xlon,xlat,xland,soiltbk,cldfrabk)
   deallocate(cldwater_3d,cldice_3d,rain_3d,nrain_3d,snow_3d,graupel_3d,cldtmp_3d)
   deallocate(nice_3d,nwater_3d)
   deallocate(vis2qc)
@@ -1328,7 +1354,7 @@ subroutine  gsdcloudanalysis(mype)
   deallocate(sat_ctp,sat_tem,w_frac,nlev_cld)
   deallocate(ref_mos_3d,ref_mos_3d_tten,lightning)
 
-  write(*,*) "CLDcount", clean_count,build_count,part_count,miss_count
+  write(*,*) "CLDcount", clean_count,few_build_count,build_count,part_count,miss_count
   if(mype==0) then
      write(6,*) '========================================'
      write(6,*) 'gsdcloudanalysis: generalized cloud analysis finished:',mype

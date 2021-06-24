@@ -1,5 +1,5 @@
-SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum, &
-                 nlat,nlon,nsig,q_bk,t_bk,p_bk, &
+SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum,r_cloudfrac_threshold, &
+                 cld_bld_coverage, nlat,nlon,nsig,q_bk,t_bk,p_bk,cldfrabk, &
                  cld_cover_3d,wthr_type,  &
                  cldwater_3d,cldice_3d,sumqci,qv_max_inc)
 !
@@ -26,12 +26,15 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum, &
 !     q_bk        - 3D moisture
 !     t_bk        - 3D background potential temperature (K)
 !     p_bk        - 3D background pressure  (hPa)
+!     cldfrabk    - 3D background cloud fraction (0 to 1)
 !     cldwater_3d - 3D analysis cloud water mixing ratio (g/kg)
 !     cldice_3d   - 3D analysis cloud ice mixing ratio (g/kg)
 !     cld_cover_3d- 3D cloud cover
 !     wthr_type   - 3D weather type
 !     l_conserve_thetaV  - if .true. conserving thetaV
 !     i_conserve_thetaV_iternum - iteration number for conserving thetaV
+!     cld_bld_coverage - fraction of cloud coverage to active building behavior,
+!                      - default 0.6
 !
 !   output argument list:
 !     q_bk        - 3D moisture
@@ -61,12 +64,15 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum, &
   integer(i_kind),intent(in):: nlat,nlon,nsig
   logical,intent(in):: l_conserve_thetaV
   integer(i_kind),intent(in):: i_conserve_thetaV_iternum
+  integer(r_single),intent(in):: r_cloudfrac_threshold 
+  integer(r_single),intent(in):: cld_bld_coverage
 !
 !  background
 !
   real(r_single),intent(inout)    :: t_bk(nlon,nlat,nsig)   ! potential temperature (K)
   real(r_single),intent(inout) :: q_bk(nlon,nlat,nsig)   ! mixing ratio (kg/kg)
   real(r_single),intent(in)    :: p_bk(nlon,nlat,nsig)   ! pressure  (hpa)
+  real(r_single),intent(in)    :: cldfrabk(nlon,nlat,nsig)   ! cloud fraction
   REAL(r_kind),intent(in)      :: sumqci(nlon,nlat,nsig)  ! total liquid water
   real(r_kind),intent(in)    :: qv_max_inc             ! max qv increment
 !
@@ -164,8 +170,8 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum, &
                  endif
             endif
             !C  - moisten layers above and below cloud layer
-            if(cld_cover_3d(i,j,k+1) > 0.6_r_kind .or.          &
-               cld_cover_3d(i,j,k-1) > 0.6_r_kind  ) then
+            if(cld_cover_3d(i,j,k+1) > cld_bld_coverage .or.          &
+               cld_cover_3d(i,j,k-1) > cld_bld_coverage  ) then
                  if( cloudqvis > q_bk(i,j,k) ) then
                     qtemp = q_bk(i,j,k) + 0.7_r_single* (cloudqvis-q_bk(i,j,k))
                     if(l_conserve_thetaV) then
@@ -181,26 +187,29 @@ SUBROUTINE cloud_saturation(mype,l_conserve_thetaV,i_conserve_thetaV_iternum, &
                  endif
             endif
           !#############################################
-          ! -- If SCT/FEW present, reduce RH only down to rh_cld3_p (0.98)
-          !         corresponding with cloudyn=3
+          ! -- If SCT/FEW present 
+          !         
           !#############################################
           elseif(cld_cover_3d(i,j,k) > 0.0001_r_kind .and.      &
-                 cld_cover_3d(i,j,k) < 0.6_r_kind ) then
-             if( q_bk(i,j,k) > cloudqvis * rh_cld3_p) then
-                 qtemp =  cloudqvis * rh_cld3_p
-                 if(l_conserve_thetaV) then
-                    do nnn=1,miter
-                       Temp=constantTv/(one + fv*qtemp)
-                       cloudqvis= ruc_saturation(Temp,p_bk(i,j,k))
-                       qtemp = cloudqvis * rh_cld3_p
-                    enddo
-                 t_bk(i,j,k) = Temp*(h1000/p_bk(i,j,k))**rd_over_cp
-                 endif
-                 !limit increment
-                 q_bk(i,j,k) = min(qtemp, q_bk(i,j,k)+qv_max_inc)
+                 cld_cover_3d(i,j,k) < cld_bld_coverage ) then
+             ! if cloud fraction does not represent partial cloud
+             if( cldfrabk(i,j,k) < r_cloudfrac_threshold) then
+                if( q_bk(i,j,k) < cloudqvis * rh_cld3_p) then
+                   qtemp =  cloudqvis * rh_cld3_p
+                   if(l_conserve_thetaV) then
+                      do nnn=1,miter
+                         Temp=constantTv/(one + fv*qtemp)
+                         cloudqvis= ruc_saturation(Temp,p_bk(i,j,k))
+                         qtemp = cloudqvis * rh_cld3_p
+                      enddo
+                      t_bk(i,j,k) = Temp*(h1000/p_bk(i,j,k))**rd_over_cp
+                   endif
+             !limit increment
+                   q_bk(i,j,k) = min(qtemp, q_bk(i,j,k)+qv_max_inc)
+                endif
              endif
           !#############################################
-          ! else: cld_cover_3d is > 0.6: cloudy case
+          ! else: cld_cover_3d is > cld_bld_coverage: cloudy case
           !#############################################
           else   ! set qv at 102%RH
              if( q_bk(i,j,k) < cloudqvis * 1.00_r_single ) then
