@@ -23,6 +23,13 @@ vfydir=$regression_vfydir
 
 ncp=/bin/cp
 
+# Set ncdump path for CSPs
+if [[ "$machine" == "Amazon" ]] || [[ "$machine" == "Azure" ]] || [[ "$machine" == "Google" ]]; then
+    ncdump=/contrib/EPIC/miniconda3/4.12.0/envs/regional_workflow/bin/ncdump
+else
+    ncdump=/bin/ncdump
+fi
+
 # Name and create temporary directory
 tmpdir=$savdir/$compare/$input/${exp1}_vs_${exp2}
 rm -rf $tmpdir
@@ -282,8 +289,8 @@ nmem=10
 imem=1
 while [[ $imem -le $nmem ]]; do
    member="_mem"`printf %03i $imem`
-   ncdump incr$member.${exp1} > incr$member.${exp1}.out
-   ncdump incr$member.${exp2} > incr$member.${exp2}.out
+   $ncdump incr$member.${exp1} > incr$member.${exp1}.out
+   $ncdump incr$member.${exp2} > incr$member.${exp2}.out
    if [ ! diff incr$member.${exp1}.out incr$member.${exp2}.out ]; then
        echo 'incr'$member'.'${exp1}' incr'$member'.'${exp2}' are NOT identical'
    else
@@ -382,8 +389,8 @@ else
    imem=1
    while [[ $imem -le $nmem ]]; do
       member="_mem"`printf %03i $imem`
-      ncdump incr$member.${exp1} > incr$member.${exp1}.out
-      ncdump incr$member.${exp3} > incr$member.${exp3}.out
+      $ncdump incr$member.${exp1} > incr$member.${exp1}.out
+      $ncdump incr$member.${exp3} > incr$member.${exp3}.out
       if [ ! diff incr$member.${exp1}.out incr$member.${exp3}.out ]; then
           echo 'incr'$member'.'${exp1}' incr'$member'.'${exp3}' are NOT identical'
       else
