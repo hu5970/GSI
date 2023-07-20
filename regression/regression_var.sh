@@ -171,10 +171,10 @@ case $machine in
     export clean=".true."
   ;;
   Amazon)
-    export noscrub="/contrib/Edward.Snyder/gsi_build/GSI/tmp"
+    export noscrub="/lustre/noscrub"
     export queue="${queue:-sbatch}"
     export group="${group:-global}"
-    export ptmp="/contrib/Edward.Snyder/gsi_build/GSI/ptmp"
+    export ptmp="/lustre/ptmp"
     export casesdir="/contrib/EPIC/GSI_data/CASES/regtest"
     export check_resource="no"
     export accnt="sa-epic"
@@ -184,10 +184,10 @@ case $machine in
     export clean=".false."
   ;;
   Azure)
-    export noscrub="/contrib/Edward.Snyder/gsi_build/GSI/tmp"
+    export noscrub="/lustre/noscrub"
     export queue="${queue:-sbatch}"
     export group="${group:-global}"
-    export ptmp="/contrib/Edward.Snyder/gsi_build/GSI/ptmp"
+    export ptmp="/lustre/ptmp"
     export casesdir="/contrib/EPIC/GSI_data/CASES/regtest"
     export check_resource="no"
     export accnt="sz-epic"
@@ -197,13 +197,12 @@ case $machine in
     export clean=".false."
   ;;
   Google)
-    export noscrub="/contrib/Edward.Snyder/gsi_build/GSI/tmp"
+    export noscrub="/lustre/noscrub"
     export queue="${queue:-sbatch}"
     export group="${group:-global}"
-    export ptmp="/contrib/Edward.Snyder/gsi_build/GSI/ptmp"
+    export ptmp="/lustre/ptmp"
     export casesdir="/contrib/EPIC/GSI_data/CASES/regtest"
     export check_resource="no"
-
     export accnt="sg-epic"
 
     #  On Cloud, there are no scrubbers to remove old contents from stmp* directories.
