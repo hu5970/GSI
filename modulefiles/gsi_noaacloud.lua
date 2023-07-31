@@ -1,17 +1,20 @@
 help([[
 ]])
 
-prepend_path("MODULEPATH", "/contrib/EPIC/miniconda3/modulefiles")
-miniconda3_ver=os.getenv("miniconda3_ver") or "4.12.0"
-load(pathJoin("miniconda3", miniconda3_ver))
+prepend_path("MODULEPATH", "/contrib/EPIC/spack-stack/spack-stack-1.4.1/envs/unified-env/install/modulefiles/Core")
+prepend_path("MODULEPATH", "/contrib/spack-stack/modulefiles/core")
 
-prepend_path("MODULEPATH", "/contrib/EPIC/spack-stack/spack-stack-1.4.1/envs/unified-dev/install/modulefiles/Core")
-load("stack-intel")
-load("stack-intel-oneapi-mpi")
-load("ufs-srw-app-env")
-load("gsi-ncdiag/1.1.1")
+local stack_intel_ver=os.getenv("stack_intel_ver") or "2021.3.0"
+local stack_impi_ver=os.getenv("stack_impi_ver") or "2021.3.0"
+local cmake_ver=os.getenv("cmake_ver") or "3.23.1"
+local stack_python_ver=os.getenv("stack_python_ver") or "3.9.12"
 
-load("gsi_common_spack")
+load(pathJoin("stack-intel", stack_intel_ver))
+load(pathJoin("stack-intel-oneapi-mpi", stack_impi_ver))
+load(pathJoin("cmake", cmake_ver))
+load(pathJoin("stack-python", stack_python_ver))
+
+load("gsi_common")
 
 pushenv("GSI_BINARY_SOURCE_DIR", "/contrib/EPIC/GSI_data/fix/20230601")
 whatis("Description: GSI environment on Cloud with Intel Compilers")
