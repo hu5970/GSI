@@ -18,6 +18,7 @@ load("gsi_common")
 
 pushenv("CFLAGS", "-xHOST")
 pushenv("FFLAGS", "-xHOST")
+load(pathJoin("openblas", openblas_ver))
 
 pushenv("GSI_BINARY_SOURCE_DIR", "/scratch1/NCEPDEV/global/glopara/fix/gsi/20230601")
 

@@ -16,6 +16,10 @@ remove_path("MODULEPATH", "/apps/prod/lmodules/INTEL_cray_mpich/19.1.3.304/cray-
 
 load("cmake")
 
+load(pathJoin("hpc", hpc_ver))
+load(pathJoin("hpc-intel", hpc_intel_ver))
+load(pathJoin("hpc-cray-mpich", hpc_cray_mpich_ver))
+
 load("gsi_common")
 
 pushenv("GSI_BINARY_SOURCE_DIR", "/lfs/h2/emc/global/noscrub/emc.global/FIX/fix/gsi/20230601")
