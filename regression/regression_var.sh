@@ -45,7 +45,14 @@ elif [[ -d /work ]]; then # Orion
   export machine="Orion"
 elif [[ -d /lfs/h2 ]]; then # wcoss2
   export machine="wcoss2"
+elif [[ "$PW_CSP" = "aws" ]]; then # NOAA Cloud AWS
+  export machine="Amazon"
+elif [[ "$PW_CSP" = "azure" ]]; then # NOAA Cloud Azure
+  export machine="Azure"
+elif [[ "$PW_CSP" = "google" ]]; then # NOAA Cloud GCP
+  export machine="Google"
 fi
+
 echo "Running Regression Tests on '$machine'";
 
 case $machine in
@@ -162,6 +169,45 @@ case $machine in
     #  On Jet, there are no scrubbers to remove old contents from stmp* directories.
     #  After completion of regression tests, will remove the regression test subdirecories
     export clean=".true."
+  ;;
+  Amazon)
+    export noscrub="/lustre/noscrub"
+    export queue="${queue:-sbatch}"
+    export group="${group:-global}"
+    export ptmp="/lustre/ptmp"
+    export casesdir="/contrib/EPIC/GSI_data/CASES/regtest"
+    export check_resource="no"
+    export accnt="sa-epic"
+
+    #  On Cloud, there are no scrubbers to remove old contents from stmp* directories.
+    #  After completion of regression tests, will remove the regression test subdirecories
+    export clean=".false."
+  ;;
+  Azure)
+    export noscrub="/lustre/noscrub"
+    export queue="${queue:-sbatch}"
+    export group="${group:-global}"
+    export ptmp="/lustre/ptmp"
+    export casesdir="/contrib/EPIC/GSI_data/CASES/regtest"
+    export check_resource="no"
+    export accnt="sz-epic"
+
+    #  On Cloud, there are no scrubbers to remove old contents from stmp* directories.
+    #  After completion of regression tests, will remove the regression test subdirecories
+    export clean=".false."
+  ;;
+  Google)
+    export noscrub="/lustre/noscrub"
+    export queue="${queue:-sbatch}"
+    export group="${group:-global}"
+    export ptmp="/lustre/ptmp"
+    export casesdir="/contrib/EPIC/GSI_data/CASES/regtest"
+    export check_resource="no"
+    export accnt="sg-epic"
+
+    #  On Cloud, there are no scrubbers to remove old contents from stmp* directories.
+    #  After completion of regression tests, will remove the regression test subdirecories
+    export clean=".false."
   ;;
   Discover)
     if [[ "$cmaketest" = "false" ]]; then

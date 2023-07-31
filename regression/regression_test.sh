@@ -23,6 +23,13 @@ vfydir=$regression_vfydir
 failed_test=0
 ncp=/bin/cp
 
+# Set ncdump path for CSPs
+if [[ "$machine" == "Amazon" ]] || [[ "$machine" == "Azure" ]] || [[ "$machine" == "Google" ]]; then
+    ncdump=/contrib/EPIC/miniconda3/4.12.0/envs/regional_workflow/bin/ncdump
+else
+    ncdump=/bin/ncdump
+fi
+
 # Name and create temporary directory
 # pc: (1) Where is "compare" defined?
 #     (2) $savdir already has $input in it, why add another one?
@@ -332,8 +339,8 @@ fi
 } >> $output
    elif [[ -f siginc.nc.${exp1} ]] ; then
 {
-ncdump siginc.nc.${exp1} > siginc.nc.${exp1}.out
-ncdump siginc.nc.${exp2} > siginc.nc.${exp2}.out
+$ncdump siginc.nc.${exp1} > siginc.nc.${exp1}.out
+$ncdump siginc.nc.${exp2} > siginc.nc.${exp2}.out
 if diff -s siginc.nc.${exp1}.out siginc.nc.${exp2}.out
 then
    echo 'The results between the two runs ('${exp1}' and '${exp2}') are reproducible'
@@ -502,8 +509,8 @@ elif [[ `expr substr $exp1 1 6` = "global" ]]; then
    elif [[ -f siginc.nc.${exp1} ]]; then
 
 {
-      ncdump siginc.nc.${exp1} > siginc.nc.${exp1}.out
-      ncdump siginc.nc.${exp3} > siginc.nc.${exp3}.out
+      $ncdump siginc.nc.${exp1} > siginc.nc.${exp1}.out
+      $ncdump siginc.nc.${exp3} > siginc.nc.${exp3}.out
 
       if diff -s siginc.nc.${exp1}.out siginc.nc.${exp3}.out
       then

@@ -37,6 +37,21 @@ case $machine in
            memnode=128
            numcore=36
     ;;
+        Amazon)
+           sub_cmd="sub_noaacloud"
+           memnode=173
+           numcore=36
+    ;;
+        Azure)
+           sub_cmd="sub_noaacloud"
+           memnode=339
+           numcore=44
+    ;;
+        Google)
+           sub_cmd="sub_noaacloud"
+           memnode=231
+           numcore=30
+    ;;
     *) # EXIT out for unresolved machine
         echo "unknown $machine"
         exit 1
@@ -74,6 +89,15 @@ case $regtest in
         elif [[ "$machine" = "Discover" ]]; then
            topts[1]="0:30:00" ; popts[1]="36/2"  ; ropts[1]="/1"
            topts[2]="0:30:00" ; popts[2]="72/3"  ; ropts[2]="/2"
+        elif [[ "$machine" = "Amazon" ]]; then
+           topts[1]="0:15:00" ; popts[1]="18/2/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="18/4/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Azure" ]]; then
+           topts[1]="0:15:00" ; popts[1]="22/2/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="22/4/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Google" ]]; then
+           topts[1]="0:15:00" ; popts[1]="15/2/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="15/4/" ; ropts[2]="/2"
         fi
 
         if [ "$debug" = ".true." ] ; then
@@ -107,6 +131,15 @@ case $regtest in
         elif [[ "$machine" = "Discover" ]]; then
             topts[1]="2:00:00" ; popts[1]="48/2"  ; ropts[1]="/1"
             topts[2]="2:00:00" ; popts[2]="60/3"  ; ropts[2]="/2"
+        elif [[ "$machine" = "Amazon" ]]; then
+            topts[1]="0:15:00" ; popts[1]="18/2/" ; ropts[1]="/1"
+            topts[2]="0:15:00" ; popts[2]="18/4/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Azure" ]]; then
+            topts[1]="0:15:00" ; popts[1]="22/2/" ; ropts[1]="/1"
+            topts[2]="0:15:00" ; popts[2]="22/4/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Google" ]]; then
+            topts[1]="0:15:00" ; popts[1]="15/2/" ; ropts[1]="/1"
+            topts[2]="0:15:00" ; popts[2]="15/4/" ; ropts[2]="/2"
         fi
 
         if [ "$debug" = ".true." ] ; then
@@ -122,6 +155,12 @@ case $regtest in
            elif [[ "$machine" = "wcoss2" ]]; then
               popts[1]="28/4/"
               topts[1]="3:00:00"
+           elif [[ "$machine" = "Amazon" ]]; then
+              popts[1]="18/4/"
+           elif [[ "$machine" = "Azure" ]]; then
+              popts[1]="22/4/"
+           elif [[ "$machine" = "Google" ]]; then
+              popts[1]="15/4/"
            fi
         fi
 
@@ -152,6 +191,15 @@ case $regtest in
         elif [[ "$machine" = "wcoss2" ]]; then
            topts[1]="0:10:00" ; popts[1]="12/8/" ; ropts[1]="/1"
            topts[2]="0:10:00" ; popts[2]="12/10/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Amazon" ]]; then
+           topts[1]="0:10:00" ; popts[1]="18/6/" ; ropts[1]="/1"
+           topts[2]="0:10:00" ; popts[2]="18/8/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Azure" ]]; then
+           topts[1]="0:10:00" ; popts[1]="22/6/" ; ropts[1]="/1"
+           topts[2]="0:10:00" ; popts[2]="22/8/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Google" ]]; then
+           topts[1]="0:10:00" ; popts[1]="15/6/" ; ropts[1]="/1"
+           topts[2]="0:10:00" ; popts[2]="15/8/" ; ropts[2]="/2"
         fi
 
         if [ "$debug" = ".true." ] ; then
@@ -182,6 +230,15 @@ case $regtest in
         elif [[ "$machine" = "wcoss2" ]]; then
            topts[1]="0:15:00" ; popts[1]="64/1/" ; ropts[1]="/1"
            topts[2]="0:15:00" ; popts[2]="128/2/" ; ropts[2]="/1"
+        elif [[ "$machine" = "Amazon" ]]; then
+           topts[1]="0:15:00" ; popts[1]="18/1/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="18/2/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Azure" ]]; then
+           topts[1]="0:15:00" ; popts[1]="22/1/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="22/2/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Google" ]]; then
+           topts[1]="0:15:00" ; popts[1]="15/1/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="15/2/" ; ropts[2]="/2"
         fi
 
         if [ "$debug" = ".true." ] ; then
@@ -212,6 +269,15 @@ case $regtest in
         elif [[ "$machine" = "wcoss2" ]]; then
            topts[1]="0:15:00" ; popts[1]="28/1/" ; ropts[1]="/1"
            topts[2]="0:15:00" ; popts[2]="28/2/" ; ropts[2]="/1"
+        elif [[ "$machine" = "Amazon" ]]; then
+           topts[1]="0:15:00" ; popts[1]="4/4/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="6/6/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Azure" ]]; then
+           topts[1]="0:15:00" ; popts[1]="4/4/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="6/6/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Google" ]]; then
+           topts[1]="0:15:00" ; popts[1]="4/4/" ; ropts[1]="/1"
+           topts[2]="0:15:00" ; popts[2]="6/6/" ; ropts[2]="/2"
         fi
 
         if [ "$debug" = ".true." ] ; then
@@ -242,6 +308,15 @@ case $regtest in
         elif [[ "$machine" = "wcoss2" ]]; then
            topts[1]="0:30:00" ; popts[1]="14/8/" ; ropts[1]="/1"
            topts[2]="0:30:00" ; popts[2]="14/14/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Amazon" ]]; then
+           topts[1]="0:30:00" ; popts[1]="8/6/" ; ropts[1]="/1"
+           topts[2]="0:30:00" ; popts[2]="8/8/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Azure" ]]; then
+           topts[1]="0:30:00" ; popts[1]="8/6/" ; ropts[1]="/1"
+           topts[2]="0:30:00" ; popts[2]="8/8/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Google" ]]; then
+           topts[1]="0:30:00" ; popts[1]="8/6/" ; ropts[1]="/1"
+           topts[2]="0:30:00" ; popts[2]="8/8/" ; ropts[2]="/2"
         fi
 
         if [ "$debug" = ".true." ] ; then
@@ -272,6 +347,15 @@ case $regtest in
         elif [[ "$machine" = "wcoss2" ]]; then
            topts[1]="0:15:00" ; popts[1]="10/10/" ; ropts[1]="/1"
            topts[2]="0:15:00" ; popts[2]="14/14/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Amazon" ]]; then
+           topts[1]="0:20:00" ; popts[1]="6/6/" ; ropts[1]="/1"
+           topts[2]="0:20:00" ; popts[2]="8/8/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Azure" ]]; then
+           topts[1]="0:20:00" ; popts[1]="6/6/" ; ropts[1]="/1"
+           topts[2]="0:20:00" ; popts[2]="8/8/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Google" ]]; then
+           topts[1]="0:20:00" ; popts[1]="6/6/" ; ropts[1]="/1"
+           topts[2]="0:20:00" ; popts[2]="8/8/" ; ropts[2]="/2"
         fi
 
         if [ "$debug" = ".true." ] ; then
@@ -302,6 +386,15 @@ case $regtest in
         elif [[ "$machine" = "wcoss2" ]]; then
            topts[1]="0:10:00" ; popts[1]="16/2/" ; ropts[1]="/1"
            topts[2]="0:10:00" ; popts[2]="16/4/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Amazon" ]]; then
+           topts[1]="0:10:00" ; popts[1]="18/2/" ; ropts[1]="/1"
+           topts[2]="0:10:00" ; popts[2]="18/4/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Azure" ]]; then
+           topts[1]="0:10:00" ; popts[1]="22/2/" ; ropts[1]="/1"
+           topts[2]="0:10:00" ; popts[2]="22/4/" ; ropts[2]="/2"
+        elif [[ "$machine" = "Google" ]]; then
+           topts[1]="0:10:00" ; popts[1]="15/2/" ; ropts[1]="/1"
+           topts[2]="0:10:00" ; popts[2]="15/4/" ; ropts[2]="/2"
         fi
 
         if [ "$debug" = ".true." ] ; then
@@ -376,4 +469,29 @@ elif [[ "$machine" = "wcoss2" ]]; then
    export APRUN="mpiexec -n \$ntasks -ppn \$ppn --cpu-bind core --depth \$threads"
 elif [[ "$machine" = "Discover" ]]; then
    export APRUN="mpiexec_mpt -np \$SLURM_NTASKS"
+elif [[ "$machine" = "Amazon" ]]; then
+   export OMP_STACKSIZE=1024M
+   export MPI_BUFS_PER_PROC=256
+   export MPI_BUFS_PER_HOST=256
+   export MPI_GROUP_MAX=256
+   export APRUN="mpiexec -v -np \$ntasks"
+elif [[ "$machine" = "Azure" ]]; then
+   export OMP_STACKSIZE=1024M
+   export MPI_BUFS_PER_PROC=256
+   export MPI_BUFS_PER_HOST=256
+   export MPI_GROUP_MAX=256
+   export APRUN="mpiexec -v -np \$ntasks"
+elif [[ "$machine" = "Google" ]]; then
+   export OMP_STACKSIZE=2048000
+   export I_MPI_HYDRA_BRANCH_COUNT=128
+   export I_MPI_HYDRA_PMI_CONNECT="alltoall"
+   export I_MPI_PIN_RESPECT_CPUSET="off"
+   export NTHSTACK=1024000000
+   export IPATH_NO_BACKTRACE=1
+   export I_MPI_OFI_PROVIDER="tcp"
+   export FI_PROVIDER="tcp"
+   export MPI_BUFS_PER_PROC=256
+   export MPI_BUFS_PER_HOST=256
+   export MPI_GROUP_MAX=256
+   export APRUN="mpiexec -v -np \$ntasks"
 fi
