@@ -22,6 +22,7 @@ local wrf_io_ver=os.getenv("wrf_io_ver") or "1.2.0"
 local ncio_ver=os.getenv("ncio_ver") or "1.1.2"
 local crtm_ver=os.getenv("crtm_ver") or "2.4.0.1"
 local ncdiag_ver=os.getenv("ncdiag_ver") or "1.1.1"
+local zlib_ver=os.getenv("zlib_ver") or "1.2.11"
 
 load(pathJoin("PrgEnv-intel", PrgEnv_intel_ver))
 load(pathJoin("intel", intel_ver))
@@ -31,6 +32,7 @@ load(pathJoin("cmake", cmake_ver))
 load(pathJoin("python", python_ver))
 
 load(pathJoin("prod_util", prod_util_ver))
+load(pathJoin("zlib", zlib_ver))
 
 load(pathJoin("netcdf", netcdf_ver))
 load(pathJoin("bufr", bufr_ver))
